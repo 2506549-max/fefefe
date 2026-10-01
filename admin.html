@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full antialiased">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="icon" type="image/png" href="/brand/logo.png" />
+<title>EarnHub Admin | Control Center</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+<style>
+:root {
+  color-scheme: dark;
+  --radius-card: 12px;
+  --radius-panel: 16px;
+  --bg-primary: #090d16;
+  --bg-secondary: #0f172a;
+  --bg-tertiary: #1e293b;
+  --border-primary: #1e293b;
+  --border-secondary: #334159;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --accent-emerald: #10b981;
+  --accent-sky: #0ea5e9;
+  --accent-rose: #f43f5e;
+  --accent-indigo: #6366f1;
+  --accent-amber: #f59e0b;
+  --accent-purple: #a855f7;
+  --accent-cyan: #06b7d6;
+  --accent-orange: #f97316;
+  --accent-red: #ef4444;
+  --accent-teal: #14b8a3;
+  --admin-bg: #05070e;
+  --admin-sidebar: #0a0e17;
+  --admin-card: #0c111a;
+}
+
+html, body { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; background: var(--admin-bg); color: var(--text-primary); }
+.font-display { font-family: 'Space Grotesk', 'Inter', sans-serif; }
+
+.sidebar-scrollbar::-webkit-scrollbar { width: 4px; }
+.sidebar-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.sidebar-scrollbar::-webkit-scrollbar-thumb { background: var(--border-secondary); border-radius: 2px; }
+
+.main-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
+.main-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.main-scrollbar::-webkit-scrollbar-thumb { background: var(--border-secondary); border-radius: 4px; }
+.main-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+#adminSidebar.mobile-open { display: block; position: fixed; inset: 56px auto 0 0; width: 260px; z-index: 60; box-shadow: 0 0 60px rgba(0, 0, 0, 0.6); }
+#sidebarBackdrop.hidden { display: none; }
+
+#sidebarBackdrop { position: fixed; inset: 56px 0 0 0; background: rgba(0, 0, 0, 0.6); z-index: 55; }
+
+#notificationPanel { max-height: 26rem; overflow-y: auto; }
+#notificationPanel::-webkit-scrollbar { width: 4px; }
+#notificationPanel::-webkit-scrollbar-track { background: transparent; }
+#notificationPanel::-webkit-scrollbar-thumb { background: var(--border-secondary); border-radius: 2px; }
+
+:focus-visible { outline: 2px solid var(--accent-emerald); outline-offset: 2px; border-radius: 6px; }
+
+.skeleton { background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--border-secondary) 37%, var(--bg-tertiary) 63%); background-size: 400% 100%; animation: skeletonShimmer 1.4s ease infinite; border-radius: 8px; }
+@keyframes skeletonShimmer { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
+
+.data-table { width: 100%; border-collapse: separate; border-spacing: 0; min-width: 720px; }
+.data-table th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); font-weight: 700; padding: 12px 16px; white-space: nowrap; }
+.data-table td { padding: 12px 16px; font-size: 14px; border-top: 1px solid var(--border-primary); color: var(--text-secondary); vertical-align: middle; }
+.data-table tbody tr { transition: background 150ms ease; }
+.data-table tbody tr:hover { background: rgba(255, 255, 255, 0.02); }
+
+.nav-link {
+  display: flex; align-items: center; gap: 12px; min-height: 40px;
+  padding: 0 12px; border-radius: var(--radius-card);
+  color: var(--text-secondary); font-weight: 500; font-size: 14px;
+  transition: all 150ms ease;
+}
+.nav-link:hover { background: rgba(16, 185, 129, 0.1); color: var(--text-primary); }
+.nav-link.active { background: var(--accent-emerald); color: #090d16; }
+.nav-link.active .nav-icon { background: rgba(255, 255, 255, 0.25); }
+
+.nav-group-label {
+  font-size: 10px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.1em; color: var(--text-muted);
+  padding: 8px 12px; margin-top: 8px;
+}
+.nav-icon {
+  display: flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; border-radius: 8px;
+  background: var(--bg-tertiary); color: var(--accent-emerald);
+  flex-shrink: 0; transition: all 150ms ease;
+}
+
+.card {
+  background: var(--admin-card);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-panel);
+  padding: 24px;
+}
+
+.table-header {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-primary);
+}
+
+.status-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: 999px; font-size: 11px;
+  font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+}
+.status-paid { background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); }
+.status-pending { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); }
+.status-failed { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); }
+.status-active { background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); }
+.status-locked { background: rgba(100, 116, 139, 0.15); color: var(--text-muted); }
+.status-draft { background: rgba(100, 116, 139, 0.15); color: var(--text-muted); }
+
+.metric-card {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.03) 100%);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: var(--radius-panel);
+  padding: 20px 24px;
+}
+.metric-value { font-family: 'Space Grotesk', 'Inter', sans-serif; font-weight: 800; font-size: 2rem; }
+
+.loading-spinner {
+  display: inline-block; width: 20px; height: 20px;
+  border: 2px solid rgba(255,255,255,0.1);
+  border-top-color: var(--accent-emerald);
+  border-radius: 50%; animation: spin 0.6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.modal-backdrop {
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex; align-items: center; justify-content: center;
+}
+.modal {
+  background: var(--admin-card);
+  border: 1px solid var(--border-primary);
+  border-radius: var(--radius-panel);
+  max-width: 600px; width: 90%;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+}
+
+.notification {
+  position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+  padding: 16px 20px; border-radius: 12px;
+  border: 1px solid; font-size: 14px; font-weight: 500;
+  backdrop-filter: blur(10px);
+  transform: translateX(400px); transition: transform 0.3s ease;
+}
+.notification.show { transform: translateX(0); }
+.notification-success { background: rgba(16, 185, 129, 0.15); border-color: var(--accent-emerald); color: #86efac; }
+.notification-error { background: rgba(239, 68, 68, 0.15); border-color: var(--accent-red); color: #fca5a5; }
+.notification-info { background: rgba(14, 165, 233, 0.15); border-color: var(--accent-sky); color: #7dd3fc; }
+
+@media (max-width: 768px) {
+  .sidebar-collapsed { display: none; }
+}
+</style>
+</head>
+<body class="h-full">
+<div id="adminApp">
+  <!-- Login Screen -->
+  <div id="loginScreen" class="flex min-h-screen items-center justify-center">
+    <div class="w-full max-w-md">
+      <div class="text-center mb-8">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-500 mb-4">
+          <i data-lucide="shield" class="h-8 w-8 text-slate-900"></i>
+        </div>
+        <h1 class="font-display text-3xl font-bold text-white">EarnHub Admin</h1>
+        <p class="text-sm text-[var(--text-secondary)] mt-2">Platform Control Center</p>
+      </div>
+      <div class="card">
+        <form id="loginForm">
+          <div class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">Email Address</label>
+              <input type="email" id="loginEmail" required
+                class="w-full h-12 px-4 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-primary)] text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--accent-emerald)] transition-colors"
+                placeholder="admin@earnhub.com" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">Password</label>
+              <input type="password" id="loginPassword" required
+                class="w-full h-12 px-4 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-primary)] text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--accent-emerald)] transition-colors"
+                placeholder="••••••••" />
+            </div>
+            <div id="loginError" class="text-sm text-red-400 min-h-5"></div>
+            <button type="submit" class="w-full h-12 rounded-xl border border-[var(--accent-emerald)]/30 bg-[var(--accent-emerald)]/10 px-4 py-2 text-sm font-semibold transition-all hover:bg-[var(--accent-emerald)]/20 flex items-center justify-center gap-2">
+              <span>Sign In</span>
+            </button>
+            <button type="button" id="showBootstrap" class="w-full text-center text-xs text-[var(--text-muted)] hover:text-[var(--text-secondary)] transition-colors pt-1">
+              First-time setup? Create the Super Admin
+            </button>
+          </div>
+        </form>
+        <div id="twofaSection" class="hidden mt-4 pt-4 border-t border-[var(--border-primary)]">
+          <h3 class="font-display text-lg font-bold text-white mb-3">Two-Factor Authentication</h3>
+          <input type="text" id="login2FA" maxlength="6"
+            class="w-full h-12 px-4 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-primary)] text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-emerald)] transition-colors text-center text-2xl tracking-widest"
+            placeholder="••••••" />
+          <button id="twofaSubmit" class="w-full h-12 rounded-xl border border-[var(--accent-emerald)]/30 bg-[var(--accent-emerald)]/10 px-4 py-2 text-sm font-semibold transition-all hover:bg-[var(--accent-emerald)]/20 mt-4">
+            Verify &amp; Continue
+          </button>
+        </div>
+        <form id="bootstrapForm" class="hidden mt-4 pt-4 border-t border-[var(--border-primary)]">
+          <h3 class="font-display text-lg font-bold text-white mb-1">Bootstrap Super Admin</h3>
+          <p class="text-xs text-[var(--text-muted)] mb-3">Only available while no admin account exists.</p>
+          <div class="space-y-3">
+            <input type="text" id="bsName" placeholder="Full name" class="w-full h-11 px-4 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-primary)] text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--accent-emerald)]" />
+            <input type="email" id="bsEmail" placeholder="admin@earnhub.com" class="w-full h-11 px-4 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-primary)] text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--accent-emerald)]" />
+            <input type="text" id="bsUsername" placeholder="username" class="w-full h-11 px-4 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-primary)] text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--accent-emerald)]" />
+            <input type="password" id="bsPassword" placeholder="Password (min 8 characters)" class="w-full h-11 px-4 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-primary)] text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--accent-emerald)]" />
+            <input type="password" id="bsSecret" placeholder="Bootstrap secret (ADMIN_BOOTSTRAP_SECRET)" class="w-full h-11 px-4 rounded-xl bg-[var(--bg-tertiary)] border border-[var(--border-primary)] text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:border-[var(--accent-emerald)]" />
+            <div id="bootstrapError" class="text-sm text-red-400 min-h-5"></div>
+            <button type="submit" class="w-full h-11 rounded-xl border border-[var(--accent-emerald)]/30 bg-[var(--accent-emerald)]/10 text-sm font-semibold text-[var(--accent-emerald)] transition-all hover:bg-[var(--accent-emerald)]/20">Create Super Admin</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admin Panel -->
+  <div id="adminPanel" class="hidden h-full flex flex-col">
+    <!-- Top Bar -->
+    <header class="sticky top-0 z-40 w-full border-b border-[var(--border-primary)] bg-[var(--admin-sidebar)]/95 backdrop-blur-md">
+      <div class="mx-auto flex max-w-[1536px] items-center justify-between px-4 h-14">
+        <div class="flex items-center gap-4">
+          <button id="toggleSidebar" class="md:hidden flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--border-primary)] bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:bg-[var(--border-secondary)] hover:text-[var(--text-primary)] transition-all">
+            <i data-lucide="menu" class="h-5 w-5"></i>
+          </button>
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
+              <i data-lucide="shield" class="h-4 w-4 text-slate-900"></i>
+            </div>
+            <span class="font-display font-bold text-lg text-white">Admin Panel</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="relative">
+            <button id="notificationsBtn" class="flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--border-primary)] bg-[var(--bg-tertiary)] text-[var(--text-secondary)] hover:bg-[var(--border-secondary)] hover:text-[var(--text-primary)] transition-all" aria-label="Notifications" aria-haspopup="true" aria-expanded="false">
+              <i data-lucide="bell" class="h-5 w-5" aria-hidden="true"></i>
+              <span id="notifBadge" class="hidden absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-[var(--accent-red)] text-white text-[10px] font-bold leading-[18px] text-center">0</span>
+            </button>
+            <div id="notificationPanel" class="hidden absolute right-0 mt-2 w-[22rem] max-w-[calc(100vw-2rem)] origin-top-right rounded-xl border border-[var(--border-primary)] bg-[var(--admin-card)] backdrop-blur-md shadow-xl z-50">
+              <div class="flex items-center justify-between px-4 py-3 border-b border-[var(--border-primary)]">
+                <span class="font-display font-bold text-sm text-white">Notifications</span>
+                <button id="notificationsRefresh" class="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors" aria-label="Refresh notifications">
+                  <i data-lucide="refresh-cw" class="h-4 w-4" aria-hidden="true"></i>
+                </button>
+              </div>
+              <div id="notificationList" class="p-2"></div>
+            </div>
+          </div>
+          <div class="relative" id="adminAccountMenu">
+            <button id="adminAccountBtn" class="flex h-9 items-center gap-2 rounded-lg border border-[var(--border-primary)] bg-[var(--bg-tertiary)] px-3 pr-8 text-[var(--text-primary)] hover:bg-[var(--border-secondary)] transition-all">
+              <span class="relative flex shrink-0 items-center justify-center overflow-hidden bg-gradient-to-br from-emerald-500 to-teal-500 text-slate-950 font-bold" style="width:28px;height:28px;border-radius:8px">
+                <span id="adminAvatar">A</span>
+              </span>
+              <span class="hidden sm:block truncate max-w-[120px] font-medium text-sm" id="adminUsername">Admin</span>
+              <i data-lucide="chevron-down" class="h-4 w-4 text-[var(--text-muted)] shrink-0"></i>
+            </button>
+            <div id="adminDropdown" class="absolute right-0 mt-2 w-48 origin-top-right rounded-xl border border-[var(--border-primary)] bg-[var(--admin-card)] backdrop-blur-md shadow-xl py-2 opacity-0 invisible pointer-events-none translate-y-2">
+              <a href="#" id="adminProfileLink" class="flex items-center gap-3 px-3 py-2.5 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)]">
+                <i data-lucide="user" class="h-4 w-4"></i> Profile
+              </a>
+              <a href="#" id="adminLogout" class="flex items-center gap-3 px-3 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-[var(--bg-tertiary)]">
+                <i data-lucide="log-out" class="h-4 w-4"></i> Sign Out
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="flex flex-1 min-h-0">
+      <!-- Sidebar -->
+      <div id="sidebarBackdrop" class="hidden md:hidden"></div>
+      <aside id="adminSidebar" class="hidden md:block w-64 flex-shrink-0 border-r border-[var(--border-primary)] bg-[var(--admin-sidebar)]">
+        <nav class="h-full overflow-y-auto sidebar-scrollbar p-3.5 space-y-1" id="adminNav">
+          <!-- Navigation will be rendered by JS -->
+        </nav>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="flex-1 min-w-0 overflow-y-auto main-scrollbar">
+        <div class="mx-auto max-w-[1536px] w-full p-6">
+          <div id="adminContent">
+            <!-- Content will be rendered by JS -->
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+</div>
+
+<script src="/admin/assets/core.js"></script>
+<script src="/admin/assets/pages-finance.js"></script>
+<script src="/admin/assets/pages-earnings.js"></script>
+  <script src="/admin/assets/pages-modules.js"></script>
+  <script src="/admin/assets/pages-chat.js"></script>
+<script src="/admin/assets/pages-system.js"></script>
+</body>
+</html>
